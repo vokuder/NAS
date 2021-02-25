@@ -67,8 +67,9 @@ Create a new user:
 ```shell
 useradd <username>
 ```
-Set a samba password for this user:
+Set passwords for this user:
 ```shell
+passwd -a <username>
 smbpasswd -a <username>
 ```
 Add a new directory for the user:
@@ -77,17 +78,18 @@ mkdir /mnt/nas_drive_1/<username>
 ```
 Set permissions:
 ```shell
-chmod -R 0775 /mnt/nas_drive_1/<username>
-sudo chown root:<username> /mnt/nas_drive_1/<username>
+chown <username>:<username> /mnt/nas_drive_1/<username>
+chmod 770 /mnt/nas_drive_1/<username>
 ```
 Open `/etc/samba/smb.conf` in a text editor and add this line:
 ```shell
-[SECURED]
+[<share-name>]
 path = /mnt/nas_drive_1/<username>
-valid users = <username>
-browsable = yes
-writable = yes
 read only = no
+create mode = 0777
+directory mode = 0777
+writable = yes
+valid users = <username>
 ```
 Restart samba service:
 ```shell
