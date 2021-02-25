@@ -63,3 +63,33 @@ Install samba:
 ```shell
 apt install samba
 ```
+Create a new user:
+```shell
+useradd <username>
+```
+Set a samba password for this user:
+```shell
+smbpasswd -a <username>
+```
+Add a new directory for the user:
+```shell
+mkdir /mnt/nas_drive_1/<username>
+```
+Set permissions:
+```shell
+chmod -R 0775 /mnt/nas_drive_1/<username>
+sudo chown root:<username> /mnt/nas_drive_1/<username>
+```
+Open `/etc/samba/smb.conf` in a text editor and add this line:
+```shell
+[SECURED]
+path = /mnt/nas_drive_1/<username>
+valid users = <username>
+browsable = yes
+writable = yes
+read only = no
+```
+Restart samba service:
+```shell
+systemctl restart smbd.service
+```
