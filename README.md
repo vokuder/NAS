@@ -20,6 +20,7 @@ w
 dd if=/dev/urandom of=/dev/sdX bs=4096 status=progress
 ```
 
+### 2) Partitioning:
 Create a new full size partition:
 ```shell
 fdisk /dev/sdX
@@ -58,7 +59,7 @@ mount -l | grep /dev/sdaX
 /dev/sdaX on /mnt/nas_drive_1 type ext4 (rw,relatime)
 ```
 
-### 2) Setting up a samba share:
+### 3) Setting up a samba share:
 Install samba:
 ```shell
 apt install samba
