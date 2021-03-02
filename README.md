@@ -1,5 +1,4 @@
-# NAS
-This is how I have setup my nas on a rasperry pi, using samba and borg backup.
+# My NAS setup on a rasperry pi:
 
 ### Solution description:
 - Raspberry pi to provide a low energy cost server machine.
