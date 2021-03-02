@@ -2,9 +2,10 @@
 
 ### Solution description:
 - Raspberry pi to provide a low energy cost server machine.
-- Samba share with login to access data across the whole LAN. 
+- Samba share with login to access data across the LAN. 
 - 1 HDD 1Tb (external) -> Will be replaced soon, take a look on the issues.
-- Daily differential backups to cloud using borg-backup.
+- Every 12 Hour differential backups to cloud using borg-backup.
+- Hourly drive syncing using rsync 
 
 ### 1) Disk preparation:
 Delete all previous partitions from the harddrive, or wipe it entirely with `dd`.
