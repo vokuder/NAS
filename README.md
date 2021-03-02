@@ -9,13 +9,13 @@
 
 ### 1) Disk preparation:
 Delete all previous partitions from the harddrive, or wipe it entirely with `dd`.
-<br>Partition deleting with `fdisk`:
+<br><strong>Partition deleting with `fdisk`</strong>:
 ```shell
 fdisk /dev/sdX
 d
 w
 ```
-<br>Wiping with random data using `dd`:
+<strong>Wiping with random data using `dd`</strong>:
 ```shell
 dd if=/dev/urandom of=/dev/sdX bs=4096 status=progress
 ```
