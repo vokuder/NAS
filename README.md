@@ -1,5 +1,5 @@
-# My NAS setup on a rasperry pi:
-This document is not complete and will be updated soon.
+# My NAS setup:
+This document explains the steps I took to setup my NAS on a raspbery pi.
 
 ### Solution description:
 - Raspberry pi to provide a low energy cost server machine.
