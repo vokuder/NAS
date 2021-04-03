@@ -1,12 +1,14 @@
 # My NAS setup:
 This document explains the steps I took to setup my NAS on a raspbery pi.
 
-### Solution description:
+## Solution description:
 - Raspberry pi because of low energy consumption.
 - Samba share with login to access data across the LAN. 
 - 2x HDDs 500Gb, synced every 1 hour to provide data redundancy.
-- No Raid1 because to be able to recover accidentally deleted files.
+
+## Steps to take in the future:
 - Every 12 Hour encrypted differential backups to cloud using borg-backup.
+
 
 ### 1) Disk preparation:
 Delete all previous partitions from the harddrive, or wipe it entirely with `dd`.
