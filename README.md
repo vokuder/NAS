@@ -1,6 +1,6 @@
 # My NAS setup:
 The following steps explain how I configured my NAS consisting of:
-- 2 HDDs (Software Raid 1) for local data redundancy
+- 2 HDDs (Software Raid 1) for data redundancy
 - LAN share with Samba
 - User home directories with password protection
 
