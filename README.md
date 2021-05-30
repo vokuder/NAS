@@ -1,91 +1,132 @@
 # My NAS setup:
-This document explains the steps I took to setup my NAS on a raspbery pi.
-
-## Solution description:
-- Raspberry pi because of low energy consumption.
-- Samba share with login to access data across the LAN. 
-- 2x HDDs 500Gb, synced every 1 hour to provide data redundancy.
-
-## Steps to take in the future:
-- Every 12 Hour encrypted differential backups to cloud using borg-backup.
+The following steps explain how I configured my NAS consisting of:
+- 2 HDDs (Software Raid 1) for local data redundancy
+- LAN share with Samba
+- User home directories with password protection
+- Encrypted drives
 
 
-### 1) Disk preparation:
-Delete all previous partitions from the harddrive, or wipe it entirely with `dd`.
-<br><strong>Partition deleting with `fdisk`</strong>:
-```shell
-fdisk /dev/sdX
-d
-w
-```
-<strong>Wiping with random data using `dd`</strong>:
-```shell
-dd if=/dev/urandom of=/dev/sdX bs=4096 status=progress
+## 1) Create partitions:
+Read disk names with `lsblk`
+<br>Before creating partitions you may need to create GPT partition tables first:
+```bash
+root@nas:~# fdisk /dev/sda
+
+Command (m for help): g
 ```
 
-### 2) Partitioning:
-Create a new full size partition:
-```shell
-fdisk /dev/sdX
-n
-Partirion type: p (primary)
-First sector: enter
-Last sector: enter
-w
+Now create the partitions on each drive:
+```bash
+root@nas:~# fdisk /dev/sda
+
+Command (m for help): n
+Partition number (1-128, default 1): 
+First sector (34-976773134, default 2048): 
+Last sector, +/-sectors or +/-size{K,M,G,T,P} (2048-976773134, default 976773134): 
+
+Created a new partition 1 of type 'Linux filesystem' and of size 465.8 GiB.
+
+Command (m for help): t
+Selected partition 1
+Partition type (type L to list all types): 29
+Changed type of partition 'Linux filesystem' to 'Linux RAID'.
+
+Command (m for help): w
+The partition table has been altered.
+Calling ioctl() to re-read partition table.
+Syncing disks.
 ```
-Create `ext4` filesystem on previously created partition:
-```shell
-mkfs.ext4 /dev/sdX
-```
-Create a new mount point:
-```shell
-mkdir /mnt/nas_drive_1
-```
-Mount the harddrive partition to the previously created mount point:
-```shell
-mount /dev/sdaX /mnt/nas/drive_1
-```
-Add fstab entry to automount:
-```shell
-nano /etc/fstab
-```
-Append this line ↓
-```shell
-/dev/sda1 /mnt/nas/drive_1 ext4 defaults 0 0
-```
-Reboot and verify if the drive got auto mounted.
-```shell
-mount -l | grep /dev/sdaX
-```
-↑ should result in ↓
-```shell
-/dev/sdaX on /mnt/nas/drive_1 type ext4 (rw,relatime)
+Now you should have the following drive schema (read from fdisk):
+
+<strong>First drive</strong>
+```bash
+Disk /dev/sda: 465.8 GiB, 500107862016 bytes, 976773168 sectors
+Disk model: 2115            
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: gpt
+Disk identifier: 1078D1CF-7AF8-4F75-B4B6-D83D14BB9419
+
+Device     Start       End   Sectors   Size Type
+/dev/sda1   2048 976773134 976771087 465.8G Linux RAID
 ```
 
-### 3) Setting up a samba share:
-Install samba:
+<br><strong>Second drive</strong>
+```bash
+Disk /dev/sdb: 465.8 GiB, 500107862016 bytes, 976773168 sectors
+Disk model: 2115            
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: gpt
+Disk identifier: 06D2213F-6889-B94F-9652-7588EE8EED04
+
+Device     Start       End   Sectors   Size Type
+/dev/sdb1   2048 976773134 976771087 465.8G Linux RAID
+```
+
+
+## 2) Setup Software Raid 1:
+Install mdadm with apt:
+```bash
+apt install mdadm -y
+```
+Tell mdadm to create a software raid 1:
+```bash
+mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sda1 /dev/sdb1
+Continue creating array? Y
+```
+Ensure mdadm started its raid syncing (first sync will take some time):
+```bash
+cat /proc/mdstat
+or
+tail -f /proc/mdstat
+```
+
+## 3) Create filesystem and mount:
+Create ext4 filesystem on raid volume:
+```bash
+mkfs.ext4 /dev/md0
+```
+Create a mountpoint:
+```bash
+mkdir /mnt/raid_1_drive
+```
+Mount the raid1 volume at the previously created mountpoint:
+```bash
+mount /dev/md0 /mnt/raid_1_drive
+```
+Create a new entry in `/etc/fstab`:
+```bash
+/dev/md0 /mnt/raid_1_drive ext4 defaults 0 0
+```
+
+
+## 3) Setting up samba share:
+Install samba with apt:
 ```shell
-apt install samba
+apt install samba -y
 ```
 Create a new user:
 ```shell
 useradd <username>
 ```
-Set passwords for this user:
+Set a password for the user:
 ```shell
-passwd -a <username>
+passwd <username>
 smbpasswd -a <username>
 ```
-Add a new directory for the user:
+Add a new share directory for the user:
 ```shell
-mkdir /mnt/nas/drive_1/<username>
+mkdir /mnt/raid_1_drive/<username>
 ```
 Set permissions:
 ```shell
-chown <username>:<username> /mnt/nas/drive_1/<username>
-chmod 770 /mnt/nas/drive_1/<username>
+chown <username>:<username> /mnt/raid_1_drive/<username>
+chmod 770 /mnt/raid_1_drive/<username>
 ```
-Open `/etc/samba/smb.conf` in a text editor and add this line:
+Open `/etc/samba/smb.conf` and tell samba about the new share:
 ```shell
 [<share-name>]
 path = /mnt/nas/drive_1/<username>
@@ -98,4 +139,11 @@ valid users = <username>
 Restart samba service:
 ```shell
 systemctl restart smbd.service
+```
+
+
+## 4) Maintenance:
+Add a cronjob to do run daily updates `crontab -e` at midnight:
+```bash
+0 0 * * * apt update && apt upgrade > /dev/null
 ```
