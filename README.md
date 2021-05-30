@@ -142,7 +142,7 @@ systemctl restart smbd.service
 
 
 ## 4) Maintenance:
-Add a cronjob to do run daily updates `crontab -e` at midnight:
+Add a cronjob to do run daily updates at midnight `crontab -e`:
 ```bash
 0 0 * * * apt update && apt upgrade > /dev/null
 ```
