@@ -173,3 +173,18 @@ Now the raid will start its sync process ... View the state with:
 ```bash
 tail -f /proc/mdstat
 ```
+### Recover data from disk that was part of a raid:
+Tell mdadm to spin up the disk:
+```bash
+mdadm --assemble --scan
+```
+↓
+```bash
+mdadm: /dev/md/1 has been started with 1 drive (out of 2)
+```
+Now create a mointpoint and mount the drive so you can access the data:
+```bash
+cd /mnt && mkdir raid_restore && mount /dev/md1 raid_restore
+```
+
+
