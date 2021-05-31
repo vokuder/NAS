@@ -168,8 +168,8 @@ Now format the disk properly (See 1: partitioning):
 <br>When done you can add the new drive to the raid:
 ```bash
 mdadm --manage /dev/md0 --add /dev/sda1
-```bash
-Now the raid will start its sync process ... View the state with:
 ```
+Now the raid will start its sync process ... View the state with:
+```bash
 tail -f /proc/mdstat
 ```
