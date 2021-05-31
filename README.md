@@ -146,3 +146,30 @@ Add a cronjob to do run daily updates at midnight `crontab -e`:
 ```bash
 0 0 * * * apt update && apt upgrade > /dev/null
 ```
+
+## How to repair broken Raid:
+### Harddrive failures:
+First identify which drive failed:
+```bash
+mdadm --detail /dev/md0
+```
+(Its helpful to place stickers on the hardware with the label of the disk)
+
+Remove the broken harddrive from the raid:
+```bash
+mdadm --manage /dev/md0 --fail /dev/sda1
+mdadm --manage /dev/md0 --remove /dev/sda1
+```
+Power down your machine and replace the broken drive (sticker with a name can be usefull)
+```bash
+shutdown -h now
+```
+Now format the disk properly (See 1: partitioning):
+<br>When done you can add the new drive to the raid:
+```bash
+mdadm --manage /dev/md0 --add /dev/sda1
+```bash
+Now the raid will start its sync process ... View the state with:
+```
+tail -f /proc/mdstat
+```
