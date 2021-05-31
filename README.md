@@ -148,7 +148,7 @@ Add a cronjob to do run daily updates at midnight `crontab -e`:
 ```
 
 ## 5) How to repair broken Raid:
-### Harddrive failures:
+### Replace broken harddrive:
 First identify which drive failed:
 ```bash
 mdadm --detail /dev/md0
