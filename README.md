@@ -178,7 +178,7 @@ Tell mdadm to spin up the disk:
 ```bash
 mdadm --assemble --scan
 ```
-↓
+Should result in ↓
 ```bash
 mdadm: /dev/md/1 has been started with 1 drive (out of 2)
 ```
