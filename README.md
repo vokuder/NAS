@@ -147,7 +147,7 @@ Add a cronjob to do run daily updates at midnight `crontab -e`:
 0 0 * * * apt update && apt upgrade > /dev/null
 ```
 
-## How to repair broken Raid:
+## 5) How to repair broken Raid:
 ### Harddrive failures:
 First identify which drive failed:
 ```bash
